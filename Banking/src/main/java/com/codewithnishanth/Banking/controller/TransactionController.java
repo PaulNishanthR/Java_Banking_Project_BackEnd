@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/transaction")
+@CrossOrigin
 public class TransactionController {
     @Autowired
     private AccountService accountService;

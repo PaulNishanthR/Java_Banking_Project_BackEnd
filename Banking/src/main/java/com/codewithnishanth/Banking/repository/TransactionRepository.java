@@ -11,4 +11,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     boolean existsByAccountIdAndCreditAmountAndDebitAmountAndBalance(Long accountId, double creditAmount, double debitAmount, double balance);
 
     List<Transaction> findByAccountId(Long accountId);
+
+    Transaction findByAccountIdAndCreditAmountAndDebitAmountAndBalance(Long id, double creditAmount, double debitAmount, double balance);
 }

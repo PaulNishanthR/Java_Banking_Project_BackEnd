@@ -12,11 +12,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/account")
+@CrossOrigin
 public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @PostMapping
+    @PostMapping("/create")
     public APIResponse createAccount(@RequestBody Account account) {
         String message = "";
         APIResponse apiResponse = new APIResponse(HttpStatus.BAD_REQUEST.value(), null, message, null);
@@ -94,6 +95,4 @@ public class AccountController {
         }
         return apiResponse;
     }
-
-
 }

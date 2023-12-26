@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -15,5 +17,6 @@ public class Transaction extends BaseEntity {
     private Long accountId;
     private double creditAmount;
     private double debitAmount;
+    private LocalDateTime updatedAt;
     private double balance;
 }

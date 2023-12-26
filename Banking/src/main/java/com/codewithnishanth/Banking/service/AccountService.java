@@ -7,6 +7,8 @@ import com.codewithnishanth.Banking.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -15,6 +17,8 @@ public class AccountService {
     private AccountRepository accountRepository;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private TransactionService transactionService;
 
     public Account createAccount(Account account) {
         return accountRepository.save(account);
@@ -27,8 +31,6 @@ public class AccountService {
     public Account credit(Long id, double amount) {
         Account account = getAccount(id).orElseThrow(() -> new RuntimeException("Account not found"));
         double previousBalance = account.getBalance();
-//        account.setBalance(account.getBalance() + amount);
-//        return accountRepository.save(account);
         account.setBalance(previousBalance + amount);
         accountRepository.save(account);
         createTransaction(account, amount, 0, previousBalance + amount);
@@ -40,8 +42,6 @@ public class AccountService {
         if (account.getBalance() < amount) {
             throw new RuntimeException("Insufficient funds");
         }
-//        account.setBalance(account.getBalance() - amount);
-//        return accountRepository.save(account);
         double previousBalance = account.getBalance();
         account.setBalance(previousBalance - amount);
         accountRepository.save(account);
@@ -50,8 +50,14 @@ public class AccountService {
     }
 
     private void createTransactionIfNeeded(Account account, double creditAmount, double debitAmount, double balance) {
-        if (!transactionRepository.existsByAccountIdAndCreditAmountAndDebitAmountAndBalance(
-                account.getId(), creditAmount, debitAmount, balance)) {
+        Transaction existingTransaction = transactionRepository.findByAccountIdAndCreditAmountAndDebitAmountAndBalance(
+                account.getId(), creditAmount, debitAmount, balance);
+
+        if (existingTransaction != null) {
+            existingTransaction.setBalance(balance);
+            existingTransaction.setUpdatedAt(LocalDateTime.now());
+            transactionService.updateTransaction(existingTransaction); // Update the transaction
+        } else {
             createTransaction(account, creditAmount, debitAmount, balance);
         }
     }
@@ -62,8 +68,7 @@ public class AccountService {
         transaction.setCreditAmount(creditAmount);
         transaction.setDebitAmount(debitAmount);
         transaction.setBalance(balance);
+        transaction.setUpdatedAt(LocalDateTime.now());
         transactionRepository.save(transaction);
     }
-
-
 }
